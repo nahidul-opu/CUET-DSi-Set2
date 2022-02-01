@@ -11,8 +11,8 @@ public class Art implements Serializable {
     private int consumptionInHour, consumptionInDay;
     private float rating;
     private ArtType artType;
-    Art(String name, float rating, ArtType artType)
-    {
+
+    Art(String name, float rating, ArtType artType) {
         this.name = name;
         startDate = new Date();
         endDate = null;
@@ -22,34 +22,29 @@ public class Art implements Serializable {
         this.artType = artType;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public int showIfTypeMatch(int i, ArtType artType)
+    public void show(int i, ArtType artType) {
+        System.out.format("%6d%20s%6d%6d%8s", i, name, consumptionInDay, consumptionInHour, String.valueOf(rating));
+        Main.printConsole("\n");
+    }
+    public ArtType getType()
     {
-        if(artType==this.artType)
-        {
-            System.out.format("%6d%20s%6d%6d%8s", i, name, consumptionInDay,consumptionInHour,String.valueOf(rating));
-            Main.printConsole("\n");
-            return 1;
-        }
-        return 0;
+        return artType;
     }
 
-    public void showDetails()
-    {
-        Main.printConsole("Name: "+name);
-        Main.printConsole("Rating: "+String.valueOf(rating));
+    public void showDetails() {
+        Main.printConsole("Name: " + name);
+        Main.printConsole("Rating: " + String.valueOf(rating));
         Main.printConsole("Start Date: " + new SimpleDateFormat("dd/MM/yyyy").format(startDate));
         String ed = "";
-        if(endDate!=null)
-        {
+        if (endDate != null) {
             ed = new SimpleDateFormat("dd/MM/yyyy").format(endDate);
         }
-        Main.printConsole("End Date: "+ed);
-        Main.printConsole("Total Consumption in Hours: "+String.valueOf(consumptionInHour));
-        Main.printConsole("Total Consumption in Days: "+String.valueOf(consumptionInDay));
+        Main.printConsole("End Date: " + ed);
+        Main.printConsole("Total Consumption in Hours: " + String.valueOf(consumptionInHour));
+        Main.printConsole("Total Consumption in Days: " + String.valueOf(consumptionInDay));
     }
 }

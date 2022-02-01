@@ -166,7 +166,7 @@ public class Main {
     private void showIndividualConsumable(Art art) {
         clearScreen();
         art.showDetails();
-        printConsole("Press Any Key to Go Back...");
+        printConsole("\nPress Any Key to Go Back...");
         try {
             System.in.read();
             return;
@@ -177,33 +177,36 @@ public class Main {
 
     private void showConsumables(ArtType artType) {
         clearScreen();
-        int cnt = 0;
         printConsole("----------------------------------------------");
         System.out.format("%6s%20s%6s%6s%8s", "Index", "Name", "Day", "Hour", "Rating");
         printConsole("\n----------------------------------------------");
+        ArrayList<Art> temp = new ArrayList<Art>();
         for (int i = 0; i < ArtList.size(); i++) {
-            cnt = cnt + ArtList.get(i).showIfTypeMatch(i + 1, artType);
+            Art t = ArtList.get(i);
+            if (t.getType() == artType) {
+                temp.add(ArtList.get(i));
+                ArtList.get(i).show(temp.size(), artType);
+            }
         }
         int option = -1;
         printConsole("Enter Index To View. Enter 0 To Go Back");
+        int cnt = temp.size();
         while (true) {
             option = readIntConsole();
-            if (option > 0 && option <= cnt) {
-                showIndividualConsumable(ArtList.get(option - 1));
+            if (option > 0 && option < cnt) {
+                showIndividualConsumable(temp.get(option - 1));
                 showConsumables(artType);
             } else if (option == 0) {
                 return;
-            }
-            else
-            {
+            } else {
                 printConsole("Invalid Input. Try Again.");
             }
         }
     }
 
     private void seeConsumable() {
-        String option = "";
-        while (!option.equals("0")) {
+        int option = -1;
+        while (option != 0) {
             clearScreen();
             printConsole("See Consumable\n\n");
             printConsole("1. Books\n" +
@@ -211,19 +214,19 @@ public class Main {
                     "3. Series\n");
             printConsole("press 0 to go back");
             printConsole("\nEnter Your Choice: ");
-            option = readConsole();
+            option = readIntConsole();
             ArtType artType = null;
             switch (option) {
-                case "1":
+                case 1:
                     artType = ArtType.BOOKS;
                     break;
-                case "2":
+                case 2:
                     artType = ArtType.MOVIES;
                     break;
-                case "3":
+                case 3:
                     artType = ArtType.SERIES;
                     break;
-                case "0":
+                case 0:
                     return;
                 default:
                     break;
