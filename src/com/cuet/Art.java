@@ -26,8 +26,17 @@ public class Art implements Serializable {
         return name;
     }
 
-    public void show(int i, ArtType artType) {
+    public void show(int i) {
         System.out.format("%6d%20s%6d%6d%8s", i, name, consumptionInDay, consumptionInHour, String.valueOf(rating));
+        Main.printConsole("\n");
+    }
+    public void showAll(int i) {
+        String ed = "";
+        if(endDate!=null)
+        {
+            ed = new SimpleDateFormat("dd/MM/yyyy").format(endDate);
+        }
+        System.out.format("%6s%20s%8s%15s%6s%6s%8s%15s", i, name, artType.toString(),new SimpleDateFormat("dd/MM/yyyy").format(startDate), consumptionInDay, consumptionInHour, String.valueOf(rating),ed);
         Main.printConsole("\n");
     }
     public ArtType getType()
@@ -46,5 +55,25 @@ public class Art implements Serializable {
         Main.printConsole("End Date: " + ed);
         Main.printConsole("Total Consumption in Hours: " + String.valueOf(consumptionInHour));
         Main.printConsole("Total Consumption in Days: " + String.valueOf(consumptionInDay));
+    }
+    public boolean isEditable()
+    {
+        return endDate==null;
+    }
+    public void addHours(int hours)
+    {
+        Main.TotalHours+=hours;
+        consumptionInHour = consumptionInHour +hours;
+        consumptionInDay = consumptionInDay + consumptionInHour/24;
+        consumptionInHour = consumptionInHour%24;
+    }
+    public  void  addDay()
+    {
+        consumptionInDay ++;
+        Main.TotalHours+=24;
+    }
+    public  void  updateRating(float rating)
+    {
+        this.rating = rating;
     }
 }

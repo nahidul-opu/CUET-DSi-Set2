@@ -14,7 +14,8 @@ import java.util.Scanner;
 public class Main {
     private ArrayList<Art> ArtList;
     private final String FileName = "Database.txt";
-
+    private final String FileName1 = "Database1.txt";
+    public static Integer TotalHours = 0;
     private static Scanner scanner = new Scanner(System.in);
 
     public static void printConsole(String st) {
@@ -52,6 +53,19 @@ public class Main {
         return text;
     }
 
+    public static Date readDateConsole() {
+        String text = "";
+        Date date;
+        text = scanner.nextLine();
+        try {
+            date = new SimpleDateFormat("dd/MM/yyyy").parse(text);
+            return date;
+        } catch (Exception e) {
+            printConsole("Invalid Date. Input Again");
+            return readDateConsole();
+        }
+    }
+
     public static void clearScreen() {
         try {
             new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
@@ -84,10 +98,36 @@ public class Main {
         fin.close();
     }
 
+    private void readTimeData() {
+        try {
+            FileInputStream fin = new FileInputStream(FileName1);
+
+            ObjectInputStream ois = new ObjectInputStream(fin);
+            TotalHours = (int) ois.readObject();
+            fin.close();
+        } catch (Exception e) {
+
+        }
+    }
+
+    private void saveTimeData()
+    {
+        FileOutputStream fout = null;
+        try {
+            fout = new FileOutputStream(FileName1);
+            ObjectOutputStream oos = new ObjectOutputStream(fout);
+            oos.writeObject(TotalHours);
+            fout.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     private void initData() {
         try {
             read();
+            readTimeData();
         } catch (Exception e) {
             ArtList = new ArrayList<Art>();
         }
@@ -157,8 +197,72 @@ public class Main {
         }
     }
 
-    private void editConsumable() {
+    private void editItem(int indx, Art art) {
+        int option = -1;
+        while (true) {
+            clearScreen();
+            printConsole("----------------------------------------------------------------------------------------");
+            System.out.format("%6s%20s%8s%15s%6s%6s%8s%15s", "Index", "Name", "Type", "Start Date", "Day", "Hour", "Rating", "End Date");
+            printConsole("\n----------------------------------------------------------------------------------------");
+            art.showAll(1);
+            printConsole("\n\n1. Add Time in Hours\n" +
+                    "2. Add A Day\n" +
+                    "3. Change rating\n" +
+                    "4. Update Consumption Date\n" +
+                    "Enter 0 to Go Back");
+            option = readIntConsole();
+            if (option == 0) {
+                ArtList.set(indx, art);
+                save();
+                saveTimeData();
+                return;
+            } else if (option == 1) {
+                printConsole("Enter Hours to Add: ");
+                int hours = readIntConsole();
+                art.addHours(hours);
+            } else if (option == 2) {
+                art.addDay();
+            } else if (option == 3) {
+                printConsole("Enter Rating: ");
+                float rating = readFloatConsole();
+                art.updateRating(rating);
+            } else if (option == 4) {
+                printConsole("Enter EndDate (dd/mm/yyyy): ");
+                Date ed = readDateConsole();
+            } else {
+                printConsole("Invalid Input. Try Again");
+            }
+        }
     }
+
+    private void editConsumable() {
+        int option = -1;
+        while (option != 0) {
+            clearScreen();
+            printConsole("Edit Consumable\n\n");
+            printConsole("----------------------------------------------------------------------------------------");
+            System.out.format("%6s%20s%8s%15s%6s%6s%8s%15s", "Index", "Name", "Type", "Start Date", "Day", "Hour", "Rating", "End Date");
+            printConsole("\n----------------------------------------------------------------------------------------");
+            ArrayList<Art> temp = new ArrayList<Art>();
+            for (int i = 0; i < ArtList.size(); i++) {
+                ArtList.get(i).showAll(i + 1);
+            }
+            printConsole("Enter Index To Edit. Enter 0 To Go Back");
+            option = readIntConsole();
+            if (option == 0)
+                return;
+            if (option > 0 && option <= ArtList.size()) {
+                if (ArtList.get(option - 1).isEditable())
+                    editItem(option - 1, ArtList.get(option - 1));
+                else
+                    printConsole("Not Editable!");
+            } else {
+                printConsole("Invalid Input. Try Again.");
+                option = readIntConsole();
+            }
+        }
+    }
+
 
     private void deleteConsumable() {
     }
@@ -166,40 +270,39 @@ public class Main {
     private void showIndividualConsumable(Art art) {
         clearScreen();
         art.showDetails();
-        printConsole("\nPress Any Key to Go Back...");
-        try {
-            System.in.read();
-            return;
-        } catch (IOException e) {
-            e.printStackTrace();
+        printConsole("\nPress 0 Key to Go Back...");
+        int option = readIntConsole();
+        while (option != 0) {
+            option = readIntConsole();
         }
     }
 
     private void showConsumables(ArtType artType) {
-        clearScreen();
-        printConsole("----------------------------------------------");
-        System.out.format("%6s%20s%6s%6s%8s", "Index", "Name", "Day", "Hour", "Rating");
-        printConsole("\n----------------------------------------------");
-        ArrayList<Art> temp = new ArrayList<Art>();
-        for (int i = 0; i < ArtList.size(); i++) {
-            Art t = ArtList.get(i);
-            if (t.getType() == artType) {
-                temp.add(ArtList.get(i));
-                ArtList.get(i).show(temp.size(), artType);
-            }
-        }
+
         int option = -1;
-        printConsole("Enter Index To View. Enter 0 To Go Back");
-        int cnt = temp.size();
-        while (true) {
+        while (option != 0) {
+            clearScreen();
+            printConsole("----------------------------------------------");
+            System.out.format("%6s%20s%6s%6s%8s", "Index", "Name", "Day", "Hour", "Rating");
+            printConsole("\n----------------------------------------------");
+            ArrayList<Art> temp = new ArrayList<Art>();
+            for (int i = 0; i < ArtList.size(); i++) {
+                Art t = ArtList.get(i);
+                if (t.getType() == artType) {
+                    temp.add(t);
+                    t.show(temp.size());
+                }
+            }
+            printConsole("Enter Index To View. Enter 0 To Go Back");
+            int cnt = temp.size();
             option = readIntConsole();
-            if (option > 0 && option < cnt) {
-                showIndividualConsumable(temp.get(option - 1));
-                showConsumables(artType);
-            } else if (option == 0) {
+            if (option == 0)
                 return;
+            if (option > 0 && option <= cnt) {
+                showIndividualConsumable(temp.get(option - 1));
             } else {
                 printConsole("Invalid Input. Try Again.");
+                option = readIntConsole();
             }
         }
     }
@@ -217,6 +320,8 @@ public class Main {
             option = readIntConsole();
             ArtType artType = null;
             switch (option) {
+                case 0:
+                    return;
                 case 1:
                     artType = ArtType.BOOKS;
                     break;
@@ -226,8 +331,6 @@ public class Main {
                 case 3:
                     artType = ArtType.SERIES;
                     break;
-                case 0:
-                    return;
                 default:
                     break;
             }
