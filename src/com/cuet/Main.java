@@ -23,7 +23,7 @@ public class Main {
 
     public static String readConsole() {
         String text = scanner.nextLine();
-        if(text.isEmpty()) return readConsole();
+        if (text.isEmpty()) return readConsole();
         else return text;
     }
 
@@ -32,7 +32,7 @@ public class Main {
         while (true) {
             try {
                 text = scanner.nextLine();
-                if(text.isEmpty()) return 0;
+                if (text.isEmpty()) return 0;
                 float val = Float.parseFloat(text);
                 return val;
             } catch (Exception e) {
@@ -47,7 +47,7 @@ public class Main {
         while (true) {
             try {
                 text = scanner.nextLine();
-                if(text.isEmpty()) return 0;
+                if (text.isEmpty()) return 0;
                 int val = Integer.parseInt(text);
                 return val;
             } catch (Exception e) {
@@ -61,7 +61,7 @@ public class Main {
         String text = "";
         Date date;
         text = scanner.nextLine();
-        if(text.isEmpty()) return null;
+        if (text.isEmpty()) return null;
         try {
             date = new SimpleDateFormat("dd/MM/yyyy").parse(text);
             return date;
@@ -72,16 +72,22 @@ public class Main {
 
     public static void clearScreen() {
         try {
-            new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            String operatingSystem = System.getProperty("os.name"); //Check the current operating system
 
-        System.out.print("\033[H\033[2J");
-        System.out.flush();
+            if (operatingSystem.contains("Windows")) {
+                ProcessBuilder pb = new ProcessBuilder("cmd", "/c", "cls");
+                Process startProcess = pb.inheritIO().start();
+                startProcess.waitFor();
+            } else {
+                ProcessBuilder pb = new ProcessBuilder("clear");
+                Process startProcess = pb.inheritIO().start();
+                startProcess.waitFor();
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
     }
+
 
     private void save() {
         FileOutputStream fout = null;
@@ -131,7 +137,7 @@ public class Main {
         float rating = readFloatConsole();
         printConsole("Enter Start Date: ");
         Date sd = readDateConsole();
-        if(sd==null) sd = new Date();
+        if (sd == null) sd = new Date();
         printConsole("Enter End Date: ");
         Date ed = readDateConsole();
         printConsole("Enter Total Consumption in Hours: 0");
@@ -361,11 +367,11 @@ public class Main {
         while (true) {
             clearScreen();
             int thour = timeTracker.getBookHour() + timeTracker.getMovieHour() + timeTracker.getSeriesHour();
-            printConsole("Total Consumption of Time: " + String.valueOf(thour%24) + "h");
+            printConsole("Total Consumption of Time: " + String.valueOf(thour % 24) + "h");
             printConsole("Individual Consumption of Time:\n" +
-                    "\t1. Books: " + String.valueOf(timeTracker.getBookHour()%24) + "h\n" +
-                    "\t2. Movies: " + String.valueOf(timeTracker.getMovieHour()%24) + "h\n" +
-                    "\t2. Series: " + String.valueOf(timeTracker.getSeriesHour()%24) + "h\n");
+                    "\t1. Books: " + String.valueOf(timeTracker.getBookHour() % 24) + "h\n" +
+                    "\t2. Movies: " + String.valueOf(timeTracker.getMovieHour() % 24) + "h\n" +
+                    "\t2. Series: " + String.valueOf(timeTracker.getSeriesHour() % 24) + "h\n");
 
             printConsole("\nTotal Consumption of Day: " + String.valueOf(thour / 24) + "d");
             printConsole("Individual Consumption of Day:\n" +
@@ -380,12 +386,10 @@ public class Main {
                 if (ArtList.get(i).getType() == ArtType.BOOKS) {
                     avgRatingB += ArtList.get(i).getRating();
                     tcB++;
-                }
-                else if (ArtList.get(i).getType() == ArtType.MOVIES) {
+                } else if (ArtList.get(i).getType() == ArtType.MOVIES) {
                     avgRatingM += ArtList.get(i).getRating();
                     tcM++;
-                }
-                else if (ArtList.get(i).getType() == ArtType.SERIES) {
+                } else if (ArtList.get(i).getType() == ArtType.SERIES) {
                     avgRatingS += ArtList.get(i).getRating();
                     tcS++;
                 }
