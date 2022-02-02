@@ -62,7 +62,6 @@ public class Art implements Serializable {
     }
     public void addHours(int hours)
     {
-        Main.TotalHours+=hours;
         consumptionInHour = consumptionInHour +hours;
         consumptionInDay = consumptionInDay + consumptionInHour/24;
         consumptionInHour = consumptionInHour%24;
@@ -70,10 +69,17 @@ public class Art implements Serializable {
     public  void  addDay()
     {
         consumptionInDay ++;
-        Main.TotalHours+=24;
     }
     public  void  updateRating(float rating)
     {
         this.rating = rating;
+    }
+    public float getRating()
+    {
+        return rating;
+    }
+    public void updateEndDate(Date ed)
+    {
+        endDate=ed;
     }
 }

@@ -14,8 +14,7 @@ import java.util.Scanner;
 public class Main {
     private ArrayList<Art> ArtList;
     private final String FileName = "Database.txt";
-    private final String FileName1 = "Database1.txt";
-    public static Integer TotalHours = 0;
+    public static TimeTracker timeTracker;
     private static Scanner scanner = new Scanner(System.in);
 
     public static void printConsole(String st) {
@@ -56,12 +55,11 @@ public class Main {
     public static Date readDateConsole() {
         String text = "";
         Date date;
-        text = scanner.nextLine();
+        text = readConsole();
         try {
             date = new SimpleDateFormat("dd/MM/yyyy").parse(text);
             return date;
         } catch (Exception e) {
-            printConsole("Invalid Date. Input Again");
             return readDateConsole();
         }
     }
@@ -98,36 +96,11 @@ public class Main {
         fin.close();
     }
 
-    private void readTimeData() {
-        try {
-            FileInputStream fin = new FileInputStream(FileName1);
-
-            ObjectInputStream ois = new ObjectInputStream(fin);
-            TotalHours = (int) ois.readObject();
-            fin.close();
-        } catch (Exception e) {
-
-        }
-    }
-
-    private void saveTimeData()
-    {
-        FileOutputStream fout = null;
-        try {
-            fout = new FileOutputStream(FileName1);
-            ObjectOutputStream oos = new ObjectOutputStream(fout);
-            oos.writeObject(TotalHours);
-            fout.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
 
     private void initData() {
+        timeTracker = TimeTracker.getInstance();
         try {
             read();
-            readTimeData();
         } catch (Exception e) {
             ArtList = new ArrayList<Art>();
         }
@@ -141,7 +114,7 @@ public class Main {
                 "3. Delete a Consumable\n" +
                 "4. See the list of consumables and individually\n" +
                 "5. See overall info\n" +
-                "Press q to Quit");
+                "\nPress q to Quit");
         printConsole("Enter Your Choice: ");
     }
 
@@ -214,14 +187,16 @@ public class Main {
             if (option == 0) {
                 ArtList.set(indx, art);
                 save();
-                saveTimeData();
+                timeTracker.save();
                 return;
             } else if (option == 1) {
                 printConsole("Enter Hours to Add: ");
                 int hours = readIntConsole();
                 art.addHours(hours);
+                timeTracker.updateTime(hours, art.getType());
             } else if (option == 2) {
                 art.addDay();
+                timeTracker.updateTime(24, art.getType());
             } else if (option == 3) {
                 printConsole("Enter Rating: ");
                 float rating = readFloatConsole();
@@ -229,6 +204,7 @@ public class Main {
             } else if (option == 4) {
                 printConsole("Enter EndDate (dd/mm/yyyy): ");
                 Date ed = readDateConsole();
+                art.updateEndDate(ed);
             } else {
                 printConsole("Invalid Input. Try Again");
             }
@@ -265,6 +241,38 @@ public class Main {
 
 
     private void deleteConsumable() {
+        int option = -1;
+        while (option != 0) {
+            clearScreen();
+            printConsole("Edit Consumable\n\n");
+            printConsole("----------------------------------------------------------------------------------------");
+            System.out.format("%6s%20s%8s%15s%6s%6s%8s%15s", "Index", "Name", "Type", "Start Date", "Day", "Hour", "Rating", "End Date");
+            printConsole("\n----------------------------------------------------------------------------------------");
+            ArrayList<Art> temp = new ArrayList<Art>();
+            for (int i = 0; i < ArtList.size(); i++) {
+                ArtList.get(i).showAll(i + 1);
+            }
+            printConsole("Enter Index To Delete. Enter 0 To Go Back");
+            option = readIntConsole();
+            if (option == 0)
+                return;
+            if (option > 0 && option <= ArtList.size()) {
+                /*printConsole("Are you sure? enter y/n");
+                String op = "";
+                while (true) {
+                    op = readConsole();
+                    if (op.equals("y")) {*/
+                ArtList.remove(option - 1);
+                save();
+                    /*}
+                    else if (op.equals("n")) break;
+                    else printConsole("Invalid Input. Try Again.");
+                }*/
+            } else {
+                printConsole("Invalid Input. Try Again.");
+                option = readIntConsole();
+            }
+        }
     }
 
     private void showIndividualConsumable(Art art) {
@@ -340,6 +348,54 @@ public class Main {
     }
 
     private void seeStat() {
+        int option = -1;
+        while (true) {
+            clearScreen();
+            int thour = timeTracker.getBookHour() + timeTracker.getMovieHour() + timeTracker.getSeriesHour();
+            printConsole("Total Consumption of Time: " + String.valueOf(thour%24) + "h");
+            printConsole("Individual Consumption of Time:\n" +
+                    "\t1. Books: " + String.valueOf(timeTracker.getBookHour()%24) + "\n" +
+                    "\t2. Movies: " + String.valueOf(timeTracker.getMovieHour()%24) + "\n" +
+                    "\t2. Series: " + String.valueOf(timeTracker.getSeriesHour()%24) + "\n");
+
+            printConsole("\nTotal Consumption of Day: " + String.valueOf(thour / 24) + "h");
+            printConsole("Individual Consumption of Day:\n" +
+                    "\t1. Books: " + String.valueOf(timeTracker.getBookHour() / 24) + "\n" +
+                    "\t2. Movies: " + String.valueOf(timeTracker.getMovieHour() / 24) + "\n" +
+                    "\t2. Series: " + String.valueOf(timeTracker.getSeriesHour() / 24) + "\n");
+            float avgRating = 0, avgRatingB = 0, avgRatingM = 0, avgRatingS = 0;
+            int tc = 0, tcB = 0, tcM = 0, tcS = 0;
+            for (int i = 0; i < ArtList.size(); i++) {
+                avgRating += ArtList.get(i).getRating();
+                tc++;
+                if (ArtList.get(i).getType() == ArtType.BOOKS) {
+                    avgRatingB += ArtList.get(i).getRating();
+                    tcB++;
+                }
+                else if (ArtList.get(i).getType() == ArtType.MOVIES) {
+                    avgRatingM += ArtList.get(i).getRating();
+                    tcM++;
+                }
+                else if (ArtList.get(i).getType() == ArtType.SERIES) {
+                    avgRatingS += ArtList.get(i).getRating();
+                    tcS++;
+                }
+            }
+            printConsole("\nAverage Rating: " + String.valueOf(avgRating / ArtList.size()));
+            printConsole("Average Rating of Each Type:\n" +
+                    "\t1. Books: " + String.valueOf(avgRatingB / ArtList.size()) + "\n" +
+                    "\t2. Movies: " + String.valueOf(avgRatingM / ArtList.size()) + "\n" +
+                    "\t2. Series: " + String.valueOf(avgRatingS / ArtList.size()) + "\n");
+
+            printConsole("\nTotal Consumables: " + String.valueOf(tc));
+            printConsole("Total Consumables of Each Type:\n" +
+                    "\t1. Books: " + String.valueOf(tcB) + "\n" +
+                    "\t2. Movies: " + String.valueOf(tcM) + "\n" +
+                    "\t2. Series: " + String.valueOf(tcS) + "\n");
+            printConsole("\nEnter 0 to Go Back");
+            option = readIntConsole();
+            if (option == 0) return;
+        }
     }
 
 
