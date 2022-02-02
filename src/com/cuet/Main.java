@@ -23,39 +23,45 @@ public class Main {
 
     public static String readConsole() {
         String text = scanner.nextLine();
-        return text;
+        if(text.isEmpty()) return readConsole();
+        else return text;
     }
 
     public static float readFloatConsole() {
-        float text = -100f;
-        while (text == -100f) {
+        String text = "";
+        while (true) {
             try {
-                text = scanner.nextFloat();
+                text = scanner.nextLine();
+                if(text.isEmpty()) return 0;
+                float val = Float.parseFloat(text);
+                return val;
             } catch (Exception e) {
                 printConsole("Invalid Input. Enter Again.");
                 scanner.nextLine();
             }
         }
-        return text;
     }
 
     public static int readIntConsole() {
-        int text = -100;
-        while (text == -100) {
+        String text = "";
+        while (true) {
             try {
-                text = scanner.nextInt();
+                text = scanner.nextLine();
+                if(text.isEmpty()) return 0;
+                int val = Integer.parseInt(text);
+                return val;
             } catch (Exception e) {
                 printConsole("Invalid Input. Enter Again.");
                 scanner.nextLine();
             }
         }
-        return text;
     }
 
     public static Date readDateConsole() {
         String text = "";
         Date date;
-        text = readConsole();
+        text = scanner.nextLine();
+        if(text.isEmpty()) return null;
         try {
             date = new SimpleDateFormat("dd/MM/yyyy").parse(text);
             return date;
@@ -123,11 +129,14 @@ public class Main {
         String name = readConsole();
         printConsole("Enter Rating: ");
         float rating = readFloatConsole();
-        printConsole("Start Date: " + new SimpleDateFormat("dd/MM/yyyy").format(new Date()));
-        printConsole("End Date: ");
-        printConsole("Total Consumption in Hours: 0");
+        printConsole("Enter Start Date: ");
+        Date sd = readDateConsole();
+        if(sd==null) sd = new Date();
+        printConsole("Enter End Date: ");
+        Date ed = readDateConsole();
+        printConsole("Enter Total Consumption in Hours: 0");
         printConsole("Total Consumption in Days: 0");
-        return new Art(name, rating, artType);
+        return new Art(name, rating, artType, sd, ed);
     }
 
     private void addConsumable() {
@@ -354,15 +363,15 @@ public class Main {
             int thour = timeTracker.getBookHour() + timeTracker.getMovieHour() + timeTracker.getSeriesHour();
             printConsole("Total Consumption of Time: " + String.valueOf(thour%24) + "h");
             printConsole("Individual Consumption of Time:\n" +
-                    "\t1. Books: " + String.valueOf(timeTracker.getBookHour()%24) + "\n" +
-                    "\t2. Movies: " + String.valueOf(timeTracker.getMovieHour()%24) + "\n" +
-                    "\t2. Series: " + String.valueOf(timeTracker.getSeriesHour()%24) + "\n");
+                    "\t1. Books: " + String.valueOf(timeTracker.getBookHour()%24) + "h\n" +
+                    "\t2. Movies: " + String.valueOf(timeTracker.getMovieHour()%24) + "h\n" +
+                    "\t2. Series: " + String.valueOf(timeTracker.getSeriesHour()%24) + "h\n");
 
-            printConsole("\nTotal Consumption of Day: " + String.valueOf(thour / 24) + "h");
+            printConsole("\nTotal Consumption of Day: " + String.valueOf(thour / 24) + "d");
             printConsole("Individual Consumption of Day:\n" +
-                    "\t1. Books: " + String.valueOf(timeTracker.getBookHour() / 24) + "\n" +
-                    "\t2. Movies: " + String.valueOf(timeTracker.getMovieHour() / 24) + "\n" +
-                    "\t2. Series: " + String.valueOf(timeTracker.getSeriesHour() / 24) + "\n");
+                    "\t1. Books: " + String.valueOf(timeTracker.getBookHour() / 24) + "d\n" +
+                    "\t2. Movies: " + String.valueOf(timeTracker.getMovieHour() / 24) + "d\n" +
+                    "\t2. Series: " + String.valueOf(timeTracker.getSeriesHour() / 24) + "d\n");
             float avgRating = 0, avgRatingB = 0, avgRatingM = 0, avgRatingS = 0;
             int tc = 0, tcB = 0, tcM = 0, tcS = 0;
             for (int i = 0; i < ArtList.size(); i++) {
@@ -383,9 +392,9 @@ public class Main {
             }
             printConsole("\nAverage Rating: " + String.valueOf(avgRating / ArtList.size()));
             printConsole("Average Rating of Each Type:\n" +
-                    "\t1. Books: " + String.valueOf(avgRatingB / ArtList.size()) + "\n" +
-                    "\t2. Movies: " + String.valueOf(avgRatingM / ArtList.size()) + "\n" +
-                    "\t2. Series: " + String.valueOf(avgRatingS / ArtList.size()) + "\n");
+                    "\t1. Books: " + String.valueOf(avgRatingB / tcB) + "\n" +
+                    "\t2. Movies: " + String.valueOf(avgRatingM / tcM) + "\n" +
+                    "\t2. Series: " + String.valueOf(avgRatingS / tcS) + "\n");
 
             printConsole("\nTotal Consumables: " + String.valueOf(tc));
             printConsole("Total Consumables of Each Type:\n" +

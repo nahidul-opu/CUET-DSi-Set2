@@ -12,10 +12,10 @@ public class Art implements Serializable {
     private float rating;
     private ArtType artType;
 
-    Art(String name, float rating, ArtType artType) {
+    Art(String name, float rating, ArtType artType, Date sd, Date ed) {
         this.name = name;
-        startDate = new Date();
-        endDate = null;
+        startDate = sd;
+        endDate = ed;
         consumptionInDay = 0;
         consumptionInHour = 0;
         this.rating = rating;
