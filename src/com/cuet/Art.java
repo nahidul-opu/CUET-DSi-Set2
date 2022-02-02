@@ -11,6 +11,7 @@ public class Art implements Serializable {
     private int consumptionInHour, consumptionInDay;
     private float rating;
     private ArtType artType;
+    public static int BookHour, MovieHour, SeriesHour;
 
     Art(String name, float rating, ArtType artType) {
         this.name = name;
@@ -62,7 +63,7 @@ public class Art implements Serializable {
     }
     public void addHours(int hours)
     {
-        Main.TotalHours+=hours;
+        updateTypeHour(hours);
         consumptionInHour = consumptionInHour +hours;
         consumptionInDay = consumptionInDay + consumptionInHour/24;
         consumptionInHour = consumptionInHour%24;
@@ -70,10 +71,16 @@ public class Art implements Serializable {
     public  void  addDay()
     {
         consumptionInDay ++;
-        Main.TotalHours+=24;
+        updateTypeHour(24);
     }
     public  void  updateRating(float rating)
     {
         this.rating = rating;
+    }
+    private void updateTypeHour(int hour)
+    {
+        if(this.artType==ArtType.BOOKS) BookHour+=hour;
+        else if(this.artType==ArtType.MOVIES) MovieHour+=hour;
+        else if(this.artType==ArtType.SERIES) SeriesHour+=hour;
     }
 }

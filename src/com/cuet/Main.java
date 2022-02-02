@@ -14,8 +14,6 @@ import java.util.Scanner;
 public class Main {
     private ArrayList<Art> ArtList;
     private final String FileName = "Database.txt";
-    private final String FileName1 = "Database1.txt";
-    public static Integer TotalHours = 0;
     private static Scanner scanner = new Scanner(System.in);
 
     public static void printConsole(String st) {
@@ -98,36 +96,9 @@ public class Main {
         fin.close();
     }
 
-    private void readTimeData() {
-        try {
-            FileInputStream fin = new FileInputStream(FileName1);
-
-            ObjectInputStream ois = new ObjectInputStream(fin);
-            TotalHours = (int) ois.readObject();
-            fin.close();
-        } catch (Exception e) {
-
-        }
-    }
-
-    private void saveTimeData()
-    {
-        FileOutputStream fout = null;
-        try {
-            fout = new FileOutputStream(FileName1);
-            ObjectOutputStream oos = new ObjectOutputStream(fout);
-            oos.writeObject(TotalHours);
-            fout.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
     private void initData() {
         try {
             read();
-            readTimeData();
         } catch (Exception e) {
             ArtList = new ArrayList<Art>();
         }
@@ -214,7 +185,6 @@ public class Main {
             if (option == 0) {
                 ArtList.set(indx, art);
                 save();
-                saveTimeData();
                 return;
             } else if (option == 1) {
                 printConsole("Enter Hours to Add: ");
@@ -340,6 +310,15 @@ public class Main {
     }
 
     private void seeStat() {
+        int option = -1;
+        while (true)
+        {
+            printConsole(String.valueOf(ArtList.get(0).BookHour));
+            printConsole(String.valueOf(ArtList.get(0).MovieHour));
+            printConsole(String.valueOf(ArtList.get(0).SeriesHour));
+            option = readIntConsole();
+            if(option==0) return;
+        }
     }
 
 
