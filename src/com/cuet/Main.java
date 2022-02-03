@@ -135,10 +135,10 @@ public class Main {
         String name = readConsole();
         printConsole("Enter Rating: ");
         float rating = readFloatConsole();
-        printConsole("Enter Start Date: ");
+        printConsole("Enter Start Date(dd/mm/yyyy): ");
         Date sd = readDateConsole();
         if (sd == null) sd = new Date();
-        printConsole("Enter End Date: ");
+        printConsole("Enter End Date(dd/mm/yyyy): ");
         Date ed = readDateConsole();
         printConsole("Enter Total Consumption in Hours: 0");
         printConsole("Total Consumption in Days: 0");
